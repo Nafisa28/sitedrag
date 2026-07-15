@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+:root {
+  /* Design System - Dark Theme Base */
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  
+  /* Accent Colors - Purple to Blue Gradient */
+  --accent-purple: #a855f7;
+  --accent-blue: #3b82f6;
+  --accent-gradient-start: #a855f7;
+  --accent-gradient-end: #3b82f6;
+  
+  /* Typography Scale - Larger, more readable sizes */
+  --font-hero: 64px;
+  --font-section-heading: 36px;
+  --font-card-title: 20px;
+  --font-body: 17px;
+  --font-button: 16px;
+  --font-small: 14px;
+  
+  /* Spacing - More generous spacing */
+  --spacing-card: 48px;
+  --spacing-grid: 32px;
+  --spacing-page: 64px;
+  --spacing-element: 24px;
+  
+  /* Border Radius */
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-input: 12px;
+  
+  /* Transitions */
+  --transition-fast: 200ms ease;
+  --transition-normal: 250ms ease;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure minimum font sizes throughout */
+* {
+  font-size: inherit;
+}
+
+/* Override small text classes to be larger */
+.text-xs {
+  font-size: 0.9375rem !important; /* 15px minimum */
+}
+
+.text-sm {
+  font-size: 1rem !important; /* 16px */
+}
+
+.text-base {
+  font-size: 1.125rem !important; /* 18px */
+}
+
+.text-lg {
+  font-size: 1.375rem !important; /* 22px */
+}
+
+.text-xl {
+  font-size: 1.75rem !important; /* 28px */
+}
+
+.text-2xl {
+  font-size: 2.25rem !important; /* 36px */
+}
+
+.text-3xl {
+  font-size: 2.75rem !important; /* 44px */
+}
+
+.text-4xl {
+  font-size: 3.5rem !important; /* 56px */
+}
+
+.text-5xl {
+  font-size: 4rem !important; /* 64px */
+}
+
+.text-6xl {
+  font-size: 4.5rem !important; /* 72px */
+}
+
+/* Increase padding classes */
+.p-1, .p-2 {
+  padding: 0.75rem !important;
+}
+
+.p-3 {
+  padding: 1rem !important;
+}
+
+.p-4 {
+  padding: 1.25rem !important;
+}
+
+.p-6 {
+  padding: 1.75rem !important;
+}
+
+.p-8 {
+  padding: 2.25rem !important;
+}
+
+.px-4 {
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
+}
+
+.py-3 {
+  padding-top: 0.875rem !important;
+  padding-bottom: 0.875rem !important;
+}
+
+.py-4 {
+  padding-top: 1.25rem !important;
+  padding-bottom: 1.25rem !important;
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, textarea, select {
+  transition: all var(--transition-normal);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
