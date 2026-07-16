@@ -119,18 +119,36 @@ export default function EditorPage() {
       console.log('Adding new widget:', activeId, 'to column:', overId)
       // Find the column by ID and add the widget
       if (pageData && pageData.sections.length > 0) {
-        const firstSection = pageData.sections[0]
-        const firstRow = firstSection.rows[0]
-        const firstColumn = firstRow.columns[0]
-
-        const newWidget: Widget = {
-          id: `widget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          type: activeId as any,
-          content: getDefaultContent(activeId),
-          style: {}
+        // Search through all sections, rows, and columns to find the matching column
+        let foundSection, foundRow, foundColumn
+        for (const section of pageData.sections) {
+          for (const row of section.rows) {
+            for (const column of row.columns) {
+              if (column.id === overId) {
+                foundSection = section
+                foundRow = row
+                foundColumn = column
+                break
+              }
+            }
+            if (foundColumn) break
+          }
+          if (foundColumn) break
         }
 
-        addWidget(firstSection.id, firstRow.id, firstColumn.id, newWidget)
+        if (foundSection && foundRow && foundColumn) {
+          const newWidget: Widget = {
+            id: `widget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            type: activeId as any,
+            content: getDefaultContent(activeId),
+            style: {}
+          }
+
+          addWidget(foundSection.id, foundRow.id, foundColumn.id, newWidget)
+          console.log('Widget added successfully')
+        } else {
+          console.log('Could not find target column:', overId)
+        }
       }
     } else {
       // Reordering existing widgets - this would need more complex logic

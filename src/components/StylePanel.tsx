@@ -6,6 +6,8 @@ import { Widget } from './PageRenderer'
 export default function StylePanel() {
   const { selectedWidget, updateWidget, removeWidget, duplicateWidget } = useEditorStore()
 
+  console.log('StylePanel render - selectedWidget:', selectedWidget)
+
   if (!selectedWidget) {
     return (
       <div className="p-6">

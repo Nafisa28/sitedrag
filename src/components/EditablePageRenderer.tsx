@@ -162,6 +162,7 @@ const SortableWidget: React.FC<{ widget: Widget; columnId: string; rowId: string
       {...listeners}
       onClick={(e) => {
         e.stopPropagation()
+        console.log('Widget clicked:', widget.id, widget.type)
         setSelectedWidget(widget)
       }}
       className={`

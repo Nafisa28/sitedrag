@@ -39,12 +39,18 @@ export default function TemplatesPage() {
 
   const fetchTemplates = async () => {
     try {
+      console.log('Fetching templates from database...')
       const { data, error } = await supabase
         .from('templates')
         .select('*')
         .order('name', { ascending: true })
 
       if (error) throw error
+
+      console.log('Templates fetched:', data)
+      console.log('Number of templates:', data?.length || 0)
+      console.log('Template categories:', data?.map(t => t.category))
+
       setTemplates(data || [])
     } catch (error) {
       console.error('Error fetching templates:', error)
@@ -105,11 +111,24 @@ export default function TemplatesPage() {
         : defaultPageData
 
       // Create new site from template
+      const siteName = `${template.name} - Copy`
+      const slug = siteName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+      console.log('Creating site with data:', {
+        user_id: user!.id,
+        name: siteName,
+        slug: slug,
+        page_data: pageDataToUse,
+        template_id: template.id,
+        status: 'draft',
+      })
+
       const { data: siteData, error: siteError } = await supabase
         .from('sites')
         .insert({
           user_id: user!.id,
-          name: `${template.name} - Copy`,
+          name: siteName,
+          slug: slug,
           page_data: pageDataToUse,
           template_id: template.id,
           status: 'draft',
@@ -117,12 +136,18 @@ export default function TemplatesPage() {
         .select()
         .single()
 
-      if (siteError) throw siteError
+      if (siteError) {
+        console.error('Supabase error details:', siteError)
+        throw siteError
+      }
+
+      console.log('Site created successfully:', siteData)
 
       // Redirect to editor with the new site
       router.push(`/editor/${siteData.id}`)
     } catch (error) {
       console.error('Error creating site from template:', error)
+      console.error('Error details:', JSON.stringify(error, null, 2))
       setCreating(null)
     }
   }
