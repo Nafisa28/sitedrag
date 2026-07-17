@@ -1,10 +1,23 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useEditorStore } from '@/store/editorStore'
 import { Widget } from './PageRenderer'
 
 export default function StylePanel() {
   const { selectedWidget, updateWidget, removeWidget, duplicateWidget } = useEditorStore()
+
+  // Local state for input values to prevent focus loss on every keystroke
+  const [localContent, setLocalContent] = useState<Record<string, any>>({})
+  const [localStyle, setLocalStyle] = useState<Record<string, any>>({})
+
+  // Sync local state when selected widget changes
+  useEffect(() => {
+    if (selectedWidget) {
+      setLocalContent(selectedWidget.content)
+      setLocalStyle(selectedWidget.style)
+    }
+  }, [selectedWidget])
 
   console.log('StylePanel render - selectedWidget:', selectedWidget)
 
@@ -19,17 +32,23 @@ export default function StylePanel() {
     )
   }
 
-  const { type, content, style } = selectedWidget
+  const { type } = selectedWidget
 
   const handleContentChange = (key: string, value: any) => {
+    setLocalContent(prev => ({ ...prev, [key]: value }))
+  }
+
+  const handleContentBlur = () => {
     updateWidget(selectedWidget.id, {
-      content: { ...content, [key]: value }
+      content: localContent
     })
   }
 
   const handleStyleChange = (key: string, value: any) => {
+    setLocalStyle(prev => ({ ...prev, [key]: value }))
+    // Update style immediately (no blur needed for style changes)
     updateWidget(selectedWidget.id, {
-      style: { ...style, [key]: value }
+      style: { ...localStyle, [key]: value }
     })
   }
 
@@ -53,16 +72,18 @@ export default function StylePanel() {
               <label className="block text-slate-400 text-base mb-2">Text</label>
               <input
                 type="text"
-                value={content.text || ''}
+                value={localContent.text || ''}
                 onChange={(e) => handleContentChange('text', e.target.value)}
+                onBlur={handleContentBlur}
                 className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
             <div>
               <label className="block text-slate-400 text-base mb-2">Level</label>
               <select
-                value={content.level || 2}
+                value={localContent.level || 2}
                 onChange={(e) => handleContentChange('level', parseInt(e.target.value))}
+                onBlur={handleContentBlur}
                 className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value={1}>H1</option>
@@ -80,8 +101,9 @@ export default function StylePanel() {
           <div>
             <label className="block text-slate-400 text-base mb-2">Text</label>
             <textarea
-              value={content.text || ''}
+              value={localContent.text || ''}
               onChange={(e) => handleContentChange('text', e.target.value)}
+              onBlur={handleContentBlur}
               rows={4}
               className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
@@ -93,8 +115,9 @@ export default function StylePanel() {
             <label className="block text-slate-400 text-base mb-2">Button Text</label>
             <input
               type="text"
-              value={content.text || 'Button'}
+              value={localContent.text || 'Button'}
               onChange={(e) => handleContentChange('text', e.target.value)}
+              onBlur={handleContentBlur}
               className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
@@ -106,8 +129,9 @@ export default function StylePanel() {
               <label className="block text-slate-400 text-base mb-2">Image URL</label>
               <input
                 type="text"
-                value={content.url || ''}
-                onChange={(e) => handleContentChange('url', e.target.value)}
+                value={localContent.src || ''}
+                onChange={(e) => handleContentChange('src', e.target.value)}
+                onBlur={handleContentBlur}
                 className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
@@ -115,8 +139,9 @@ export default function StylePanel() {
               <label className="block text-slate-400 text-base mb-2">Alt Text</label>
               <input
                 type="text"
-                value={content.alt || ''}
+                value={localContent.alt || ''}
                 onChange={(e) => handleContentChange('alt', e.target.value)}
+                onBlur={handleContentBlur}
                 className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
@@ -128,8 +153,9 @@ export default function StylePanel() {
             <label className="block text-slate-400 text-base mb-2">Height (px)</label>
             <input
               type="number"
-              value={parseInt(content.height) || 20}
+              value={parseInt(localContent.height) || 20}
               onChange={(e) => handleContentChange('height', `${e.target.value}px`)}
+              onBlur={handleContentBlur}
               className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
@@ -139,8 +165,9 @@ export default function StylePanel() {
           <div>
             <label className="block text-slate-400 text-base mb-2">Items (one per line)</label>
             <textarea
-              value={(content.items || []).join('\n')}
+              value={(localContent.items || []).join('\n')}
               onChange={(e) => handleContentChange('items', e.target.value.split('\n').filter(i => i.trim()))}
+              onBlur={handleContentBlur}
               rows={4}
               className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
@@ -151,13 +178,13 @@ export default function StylePanel() {
       {/* Style Properties */}
       <div className="mb-8">
         <h3 className="text-slate-300 font-medium mb-4 text-lg">Style</h3>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-slate-400 text-base mb-2">Color</label>
             <input
               type="color"
-              value={style.color || '#000000'}
+              value={localStyle.color || '#000000'}
               onChange={(e) => handleStyleChange('color', e.target.value)}
               className="w-full h-12 bg-slate-800 border border-slate-700 rounded-xl cursor-pointer"
             />
@@ -167,7 +194,7 @@ export default function StylePanel() {
             <label className="block text-slate-400 text-base mb-2">Background Color</label>
             <input
               type="color"
-              value={style.backgroundColor || '#ffffff'}
+              value={localStyle.backgroundColor || '#ffffff'}
               onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
               className="w-full h-12 bg-slate-800 border border-slate-700 rounded-xl cursor-pointer"
             />
@@ -177,7 +204,7 @@ export default function StylePanel() {
             <label className="block text-slate-400 text-base mb-2">Font Size (px)</label>
             <input
               type="number"
-              value={parseInt(style.fontSize) || 16}
+              value={parseInt(localStyle.fontSize) || 16}
               onChange={(e) => handleStyleChange('fontSize', `${e.target.value}px`)}
               className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
@@ -186,7 +213,7 @@ export default function StylePanel() {
           <div>
             <label className="block text-slate-400 text-base mb-2">Alignment</label>
             <select
-              value={style.textAlign || 'left'}
+              value={localStyle.textAlign || 'left'}
               onChange={(e) => handleStyleChange('textAlign', e.target.value)}
               className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
@@ -200,7 +227,7 @@ export default function StylePanel() {
             <label className="block text-slate-400 text-base mb-2">Padding (px)</label>
             <input
               type="number"
-              value={parseInt(style.padding) || 0}
+              value={parseInt(localStyle.padding) || 0}
               onChange={(e) => handleStyleChange('padding', `${e.target.value}px`)}
               className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
@@ -210,7 +237,7 @@ export default function StylePanel() {
             <label className="block text-slate-400 text-base mb-2">Margin (px)</label>
             <input
               type="number"
-              value={parseInt(style.margin) || 0}
+              value={parseInt(localStyle.margin) || 0}
               onChange={(e) => handleStyleChange('margin', `${e.target.value}px`)}
               className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
