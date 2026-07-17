@@ -22,6 +22,7 @@ export default function EditorPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [siteName, setSiteName] = useState('')
+  const [siteStatus, setSiteStatus] = useState('draft')
   const [activeDrag, setActiveDrag] = useState<string | null>(null)
 
   useEffect(() => {
@@ -53,6 +54,7 @@ export default function EditorPage() {
 
       console.log('Site data loaded:', data)
       setSiteName(data.name)
+      setSiteStatus(data.status || 'draft')
       
       // Parse page_data if it's a string, otherwise use as-is
       const parsedPageData = typeof data.page_data === 'string' 
@@ -117,12 +119,22 @@ export default function EditorPage() {
     if (isFromPalette) {
       // Dragging new widget from palette
       console.log('Adding new widget:', activeId, 'to column:', overId)
+      console.log('Page data structure:', JSON.stringify(pageData, null, 2))
+      console.log('Page data sections:', pageData?.sections)
       // Find the column by ID and add the widget
-      if (pageData && pageData.sections.length > 0) {
+      if (pageData && pageData.sections && Array.isArray(pageData.sections) && pageData.sections.length > 0) {
         // Search through all sections, rows, and columns to find the matching column
         let foundSection, foundRow, foundColumn
         for (const section of pageData.sections) {
+          if (!section || !section.rows || !Array.isArray(section.rows)) {
+            console.log('Section has no rows or is invalid:', section?.id)
+            continue
+          }
           for (const row of section.rows) {
+            if (!row.columns || !Array.isArray(row.columns)) {
+              console.log('Row has no columns:', row.id)
+              continue
+            }
             for (const column of row.columns) {
               if (column.id === overId) {
                 foundSection = section
