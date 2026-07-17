@@ -166,8 +166,15 @@ export default function StylePanel() {
             <label className="block text-slate-400 text-base mb-2">Items (one per line)</label>
             <textarea
               value={(localContent.items || []).join('\n')}
-              onChange={(e) => handleContentChange('items', e.target.value.split('\n').filter(i => i.trim()))}
-              onBlur={handleContentBlur}
+              onChange={(e) => handleContentChange('items', e.target.value.split('\n'))}
+              onBlur={() => {
+                // Filter out empty lines only when saving
+                setLocalContent(prev => ({
+                  ...prev,
+                  items: (prev.items || []).filter((i: string) => i.trim())
+                }))
+                handleContentBlur()
+              }}
               rows={4}
               className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
