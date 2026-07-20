@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { renderToHTML, renderToCSS } from '@/lib/pageExporter'
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(
   request: NextRequest,
@@ -10,8 +11,25 @@ export async function POST(
     const siteId = params.siteId
     console.log('Publish request for siteId:', siteId)
 
-    // Get the site data
-    const { data: site, error: siteError } = await supabase
+    // Get auth token from request
+    const authHeader = request.headers.get('authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    // Create a new Supabase client with the auth token
+    const supabaseWithAuth = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    )
+
+    // Get the site data using authenticated client
+    const { data: site, error: siteError } = await supabaseWithAuth
       .from('sites')
       .select('*')
       .eq('id', siteId)

@@ -106,11 +106,16 @@ export default function EditorPage() {
       // First save the current state
       await handleSave()
 
-      // Then call the publish API
+      // Get the session token
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
+      // Then call the publish API with auth token
       const response = await fetch(`/api/publish/${siteId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       })
 
