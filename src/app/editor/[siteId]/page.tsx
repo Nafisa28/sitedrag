@@ -110,6 +110,9 @@ export default function EditorPage() {
       const { data: { session } } = await supabase.auth.getSession()
       const token = session?.access_token
 
+      console.log('Session token:', token ? 'Present' : 'Missing')
+      console.log('Site ID:', siteId)
+
       // Then call the publish API with auth token
       const response = await fetch(`/api/publish/${siteId}`, {
         method: 'POST',
@@ -120,6 +123,8 @@ export default function EditorPage() {
       })
 
       const data = await response.json()
+
+      console.log('Publish API response:', response.status, data)
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to publish site')
