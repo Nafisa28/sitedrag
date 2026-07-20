@@ -22,7 +22,6 @@ export default function EditorPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [siteName, setSiteName] = useState('')
-  const [siteStatus, setSiteStatus] = useState('draft')
   const [activeDrag, setActiveDrag] = useState<string | null>(null)
 
   useEffect(() => {
@@ -54,7 +53,6 @@ export default function EditorPage() {
 
       console.log('Site data loaded:', data)
       setSiteName(data.name)
-      setSiteStatus(data.status || 'draft')
       
       // Parse page_data if it's a string, otherwise use as-is
       const parsedPageData = typeof data.page_data === 'string' 
@@ -93,6 +91,42 @@ export default function EditorPage() {
     } catch (error: any) {
       console.error('Error saving site:', error)
       setError(error.message || 'Failed to save site')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handlePublish = async () => {
+    if (!pageData) return
+
+    setSaving(true)
+    setError('')
+
+    try {
+      // First save the current state
+      await handleSave()
+
+      // Then call the publish API
+      const response = await fetch(`/api/publish/${siteId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to publish site')
+      }
+
+      // Show success message and redirect to published URL
+      alert(`Site published successfully! Your site is now live at: ${data.publishedUrl}`)
+      window.open(data.publishedUrl, '_blank')
+    } catch (error: any) {
+      console.error('Error publishing site:', error)
+      setError(error.message || 'Failed to publish site')
+      alert(`Failed to publish: ${error.message || 'Unknown error'}`)
     } finally {
       setSaving(false)
     }
@@ -290,9 +324,11 @@ export default function EditorPage() {
               {saving ? 'Saving...' : 'Save'}
             </button>
             <button
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl hover:from-purple-500 hover:to-blue-500 transition-colors text-base font-bold shadow-lg shadow-purple-500/25"
+              onClick={handlePublish}
+              disabled={saving}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl hover:from-purple-500 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-base font-bold shadow-lg shadow-purple-500/25"
             >
-              Publish
+              {saving ? 'Publishing...' : 'Publish'}
             </button>
           </div>
         </div>
