@@ -15,6 +15,9 @@ export async function POST(
     const authHeader = request.headers.get('authorization')
     const token = authHeader?.replace('Bearer ', '')
 
+    console.log('Auth header:', authHeader ? 'Present' : 'Missing')
+    console.log('Token:', token ? 'Present' : 'Missing')
+
     // Create a new Supabase client with the auth token
     const supabaseWithAuth = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,6 +40,7 @@ export async function POST(
 
     if (siteError) {
       console.error('Error fetching site:', siteError)
+      console.error('Error details:', JSON.stringify(siteError, null, 2))
       return NextResponse.json({ error: 'Failed to fetch site', details: siteError.message }, { status: 404 })
     }
 
