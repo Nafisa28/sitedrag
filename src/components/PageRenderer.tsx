@@ -88,6 +88,19 @@ const WidgetComponent: React.FC<{ widget: Widget }> = ({ widget }) => {
       )
 
     case 'button':
+      if (content.href) {
+        return (
+          <a
+            href={content.href}
+            target={content.openInNewTab ? '_blank' : '_self'}
+            rel={content.openInNewTab ? 'noopener noreferrer' : undefined}
+            style={baseStyle}
+            className="inline-block px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:opacity-90 cursor-pointer"
+          >
+            {content.text || 'Button'}
+          </a>
+        )
+      }
       return (
         <button
           style={baseStyle}

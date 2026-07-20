@@ -111,15 +111,39 @@ export default function StylePanel() {
         )}
 
         {type === 'button' && (
-          <div>
-            <label className="block text-slate-400 text-base mb-2">Button Text</label>
-            <input
-              type="text"
-              value={localContent.text || 'Button'}
-              onChange={(e) => handleContentChange('text', e.target.value)}
-              onBlur={handleContentBlur}
-              className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+          <div className="space-y-4">
+            <div>
+              <label className="block text-slate-400 text-base mb-2">Button Text</label>
+              <input
+                type="text"
+                value={localContent.text || 'Button'}
+                onChange={(e) => handleContentChange('text', e.target.value)}
+                onBlur={handleContentBlur}
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-400 text-base mb-2">Link URL (optional)</label>
+              <input
+                type="text"
+                value={localContent.href || ''}
+                onChange={(e) => handleContentChange('href', e.target.value)}
+                onBlur={handleContentBlur}
+                placeholder="https://example.com or #section-id"
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="openInNewTab"
+                checked={localContent.openInNewTab || false}
+                onChange={(e) => handleContentChange('openInNewTab', e.target.checked)}
+                onBlur={handleContentBlur}
+                className="w-5 h-5 bg-slate-800 border border-slate-700 rounded"
+              />
+              <label htmlFor="openInNewTab" className="text-slate-300 text-base">Open in new tab</label>
+            </div>
           </div>
         )}
 
